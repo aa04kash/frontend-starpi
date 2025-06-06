@@ -1,13 +1,12 @@
-// Home.tsx
 import React, { useEffect, useState } from 'react';
 import { fetchHomepageData } from '../services/apiService';
 import { HomepageData } from '../types/Homepage';
-import HeroSection from '../components/Home/HeroSection';
-import ProductShowcase from '../components/Home/ProductShowcase';
-import FeatureGrid from '../components/Home/FeatureGrid';
-import StorytellingBlock from '../components/Home/StorytellingBlock';
+import Hero from '../components/sections/Hero';
+import Showcase from '../components/sections/Showcase';
+import Features from '../components/sections/Features';
+import Story from '../components/sections/Story';
 
-const Home: React.FC = () => {
+const Homepage: React.FC = () => {
   const [homepageData, setHomepageData] = useState<HomepageData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,28 +29,33 @@ const Home: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-200 dark:border-blue-800 rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+        </div>
       </div>
     );
   }
 
   if (error || !homepageData) {
     return (
-      <div className="flex justify-center items-center min-h-screen text-red-500">
-        {error || 'Content not found.'}
+      <div className="flex justify-center items-center min-h-screen text-red-500 bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Oops! Something went wrong</h2>
+          <p>{error || 'Content not found.'}</p>
+        </div>
       </div>
     );
   }
+
   const { hero, showcases, story, blocks } = homepageData;
-  console.log(story)
   const featureBlock = blocks.find(block => block.__component === 'shared.feature');
 
-
   return (
-    <main>
+    <main className="bg-white dark:bg-gray-900">
       {hero && (
-        <HeroSection
+        <Hero
           title={hero.title}
           subtitle={hero.subtitle}
           description={hero.description}
@@ -62,22 +66,23 @@ const Home: React.FC = () => {
       )}
 
       {showcases && showcases.length > 0 && showcases.map((showcase, index) => (
-        <ProductShowcase
+        <Showcase
           key={index}
           title={showcase.title}
           description={showcase.description}
           imageUrl={showcase.imageUrl}
           buttonText={showcase.buttonText}
+          buttonLink={showcase.buttonLink}
           imagePosition={
             showcase.imagePosition === 'left' || showcase.imagePosition === 'right'
               ? showcase.imagePosition
-              : undefined
+              : index % 2 === 0 ? 'right' : 'left'
           }
         />
       ))}
 
       {featureBlock && (
-        <FeatureGrid
+        <Features
           title={featureBlock.title}
           subtitle={featureBlock.subtitle}
           features={featureBlock.features}
@@ -85,7 +90,7 @@ const Home: React.FC = () => {
       )}
 
       {story && (
-        <StorytellingBlock
+        <Story
           title={story.title}
           subtitle={story.subtitle}
           description={story.description}
@@ -98,4 +103,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Homepage;
